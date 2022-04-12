@@ -24,6 +24,7 @@ class List:
             buf = buf.next
         return word
 
+
 class Deque(List):
     def add_in_top(self, other):
         if self.head is None:
@@ -49,8 +50,6 @@ class Deque(List):
         buf1.pre = buf
 
 
-
-
 def main():
     deque = Deque()
     deque.add_in_top(5)
@@ -59,6 +58,7 @@ def main():
     deque.add_in_top(2)
     deque.add_in_end(6)
     print(deque)
+
 
 if __name__ == "__main__":
     main()
