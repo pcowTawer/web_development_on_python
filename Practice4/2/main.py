@@ -1,6 +1,3 @@
-#from functools import singledispatch
-
-
 def get_input_int():
     while True:
         try:
