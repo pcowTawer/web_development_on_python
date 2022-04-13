@@ -1,4 +1,6 @@
 from functools import singledispatch
+import io
+import os
 
 
 def get_input_int():
@@ -135,13 +137,18 @@ def input_note(label) -> Note:
 
 @input_note.register(str)
 def _(label) -> Note:
+    print(label)
+    return input_note(None)
+
+
+@input_note.register(io.TextIOBase)
+def _(label) -> Note:
     note = Note()
-    with open(label, "r") as f:
-        note.set_name(f.readline())
-        note.set_surname(f.readline())
-        note.set_phone_number(f.readline())
-        note.set_birth_date([f.readline(), f.readline(), f.readline()])
-        return note
+    note.set_name(label.readline())
+    note.set_surname(label.readline())
+    note.set_phone_number(label.readline())
+    note.set_birth_date([label.readline(), label.readline(), label.readline()])
+    return note
 
 
 def print_note(note: Note):
@@ -159,9 +166,19 @@ def main():
                      Note(), Note(), Note(), Note()]
     list_of_notes[0] = input_note(None)
     print_note(list_of_notes[0])
-    list_of_notes[1] = input_note("text.txt")
+    input()
+    os.system("cls || clear")
+
+    list_of_notes[1] = input_note("text")
     print_note(list_of_notes[1])
     input()
+    os.system("cls || clear")
+
+    with open("text.txt", "r") as f:
+        list_of_notes[2] = input_note(f)
+    print_note(list_of_notes[2])
+    input()
+    os.system("cls || clear")
 
 
 if __name__ == "__main__":
