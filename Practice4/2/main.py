@@ -1,3 +1,6 @@
+from functools import singledispatch
+
+
 def get_input_int():
     while True:
         try:
@@ -118,7 +121,8 @@ class Note:
             self._birth_date = [day, month, year]
 
 
-def input_note() -> Note:
+@singledispatch
+def input_note(label) -> Note:
     note = Note()
     note.set_name(input("Введите имя: "))
     note.set_surname(input("Введите фамилию: "))
@@ -129,13 +133,25 @@ def input_note() -> Note:
     return note
 
 
+@input_note.register(str)
+def _(label) -> Note:
+    note = Note()
+    with open(label, "r") as f:
+        note.set_name(f.readline())
+        note.set_surname(f.readline())
+        note.set_phone_number(f.readline())
+        note.set_birth_date([f.readline(), f.readline(), f.readline()])
+        return note
+
+
 def print_note(note: Note):
     print("Имя: ", note.get_name())
     print("Фамилия: ", note.get_surname())
-    print("Номер телефона: ", )
+    print("Номер телефона: ", note.get_phone_number())
     print("Дата рождения: ", end="")
     for x in note.get_birth_date():
         print(x, end=" ")
+    print()
 
 
 def main():
@@ -143,6 +159,8 @@ def main():
                      Note(), Note(), Note(), Note()]
     list_of_notes[0] = input_note()
     print_note(list_of_notes[0])
+    list_of_notes[1] = input_note("text.txt")
+    print_note(list_of_notes[1])
     input()
 
 
