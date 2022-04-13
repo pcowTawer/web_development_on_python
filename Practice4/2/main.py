@@ -1,6 +1,6 @@
 from functools import singledispatch
 import io
-import os
+from operator import methodcaller
 
 
 def get_input_int():
@@ -122,6 +122,15 @@ class Note:
         if check_date([day, month, year]):
             self._birth_date = [day, month, year]
 
+    def print_note(self):
+        print("Имя: ", self._name)
+        print("Фамилия: ", self._surname)
+        print("Номер телефона: ", self._phone_number)
+        print("Дата рождения: ", end="")
+        for x in self._birth_date:
+            print(x, end=" ")
+        print()
+
 
 @singledispatch
 def input_note(label) -> Note:
@@ -144,41 +153,54 @@ def _(label) -> Note:
 @input_note.register(io.TextIOBase)
 def _(label) -> Note:
     note = Note()
-    note.set_name(label.readline())
-    note.set_surname(label.readline())
+    note.set_name(str.rstrip(label.readline()))
+    note.set_surname(str.rstrip(label.readline()))
     note.set_phone_number(label.readline())
     note.set_birth_date([label.readline(), label.readline(), label.readline()])
     return note
 
 
-def print_note(note: Note):
-    print("Имя: ", note.get_name())
-    print("Фамилия: ", note.get_surname())
-    print("Номер телефона: ", note.get_phone_number())
-    print("Дата рождения: ", end="")
-    for x in note.get_birth_date():
-        print(x, end=" ")
-    print()
+def find_note(list_of_notes: list, surname: str):
+    i: int = 0
+    count: int = 0
+    print("Ищю человека с фамилией", surname)
+    try:
+        for note in list_of_notes:
+            if note.get_surname() == surname:
+                note.print_note()
+                count = count + 1
+            i = i + 1
+        if count == 0:
+            print("Человек с такой фамилией не найден")
+    except AttributeError:
+        print("В списке переданном find_note", i,
+              "элемент не является объектом класса Note")
 
 
 def main():
     list_of_notes = [Note(), Note(), Note(), Note(),
                      Note(), Note(), Note(), Note()]
-    list_of_notes[0] = input_note(None)
-    print_note(list_of_notes[0])
-    input()
-    os.system("cls || clear")
-
-    list_of_notes[1] = input_note("text")
-    print_note(list_of_notes[1])
-    input()
-    os.system("cls || clear")
-
+    # list_of_notes[0] = input_note(None)
+    # print_note(list_of_notes[0])
+    # input()
+    # os.system("cls || clear")
+    #
+    # list_of_notes[1] = input_note("text")
+    # print_note(list_of_notes[1])
+    # input()
+    # os.system("cls || clear")
+    #
+    # with open("text.txt", "r") as f:
+    #     list_of_notes[2] = input_note(f)
+    # print_note(list_of_notes[2])
+    # input()
+    # os.system("cls || clear")
     with open("text.txt", "r") as f:
-        list_of_notes[2] = input_note(f)
-    print_note(list_of_notes[2])
-    input()
-    os.system("cls || clear")
+        for i in range(list_of_notes.__len__()):
+            list_of_notes[i] = input_note(f)
+        list_of_notes.sort(key=methodcaller("get_phone_number"))
+        for note in list_of_notes:
+            note.print_note()
 
 
 if __name__ == "__main__":
