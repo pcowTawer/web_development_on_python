@@ -1,5 +1,6 @@
 from functools import singledispatch
 import io
+import os
 from operator import methodcaller
 
 
@@ -63,6 +64,8 @@ def check_date(date: list) -> bool:
                 input()
                 return False
     return True
+
+
 
 
 class Note:
@@ -131,9 +134,13 @@ class Note:
             print(x, end=" ")
         print()
 
+    def __del__(self):
+        pass
+
 
 @singledispatch
 def input_note(label) -> Note:
+    os.system("cls || clean")
     note = Note()
     note.set_name(input("Введите имя: "))
     note.set_surname(input("Введите фамилию: "))
@@ -152,6 +159,7 @@ def _(label) -> Note:
 
 @input_note.register(io.TextIOBase)
 def _(label) -> Note:
+    os.system("cls || clean")
     note = Note()
     note.set_name(str.rstrip(label.readline()))
     note.set_surname(str.rstrip(label.readline()))
@@ -177,30 +185,68 @@ def find_note(list_of_notes: list, surname: str):
               "элемент не является объектом класса Note")
 
 
+def menu() -> int:
+    os.system("cls || clean")
+    while True:
+        print("1. Создать заметку(максимум 8)")
+        print("2. Вывести все заметки")
+        print("3. Удалить заметку")
+        print("4. Найти по фамилии")
+        print("5. Выход")
+        buf = get_input_int()
+        if buf < 1 or buf > 5:
+            print("Нет такой опции")
+            input()
+            os.system("cls || clear")
+            continue
+        os.system("cls || clear")
+        return buf
+
+
 def main():
-    list_of_notes = [Note(), Note(), Note(), Note(),
-                     Note(), Note(), Note(), Note()]
-    # list_of_notes[0] = input_note(None)
-    # print_note(list_of_notes[0])
-    # input()
-    # os.system("cls || clear")
-    #
-    # list_of_notes[1] = input_note("text")
-    # print_note(list_of_notes[1])
-    # input()
-    # os.system("cls || clear")
-    #
-    # with open("text.txt", "r") as f:
-    #     list_of_notes[2] = input_note(f)
-    # print_note(list_of_notes[2])
-    # input()
-    # os.system("cls || clear")
-    with open("text.txt", "r") as f:
-        for i in range(list_of_notes.__len__()):
-            list_of_notes[i] = input_note(f)
-        list_of_notes.sort(key=methodcaller("get_phone_number"))
-        for note in list_of_notes:
-            note.print_note()
+    list_of_notes = []
+    count_of_notes = 0
+    while True:
+        flag = menu()
+        if flag == 1:
+            if count_of_notes >= 8:
+                print("Невозможно добавить новую запись!")
+                input()
+                continue
+            count_of_notes += 1
+            list_of_notes.append(input_note(None))
+            list_of_notes.sort(key=methodcaller("get_phone_number"))
+        if flag == 2:
+            for note in list_of_notes:
+                note.print_note()
+            input()
+        if flag == 3:
+            i: int = 0
+            for i in range(count_of_notes):
+                print(i + 1, end=") ")
+                list_of_notes[i].print_note()
+            print("Введите номер note:")
+            buf = get_input_int()
+            if buf > count_of_notes or buf < 1:
+                print("Нет такого параметра")
+                input()
+                continue
+            count_of_notes -= 1
+            list_of_notes.pop(buf - 1)
+            list_of_notes.sort(key=methodcaller("get_phone_number"))
+
+        if flag == 4:
+            surname = input("Введите фамилию: ")
+            exist: bool = False
+            for note in list_of_notes:
+                if note.get_surname() == surname:
+                    exist = True
+                    note.print_note()
+            if not exist:
+                print("Нет человека с такой фамилией!")
+            input()
+        if flag == 5:
+            return
 
 
 if __name__ == "__main__":
