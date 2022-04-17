@@ -66,8 +66,6 @@ def check_date(date: list) -> bool:
     return True
 
 
-
-
 class Note:
     def __init__(self):
         self._name = ""
@@ -125,17 +123,18 @@ class Note:
         if check_date([day, month, year]):
             self._birth_date = [day, month, year]
 
-    def print_note(self):
-        print("Имя: ", self._name)
-        print("Фамилия: ", self._surname)
-        print("Номер телефона: ", self._phone_number)
-        print("Дата рождения: ", end="")
-        for x in self._birth_date:
-            print(x, end=" ")
-        print()
-
     def __del__(self):
         pass
+
+
+def print_note(note: Note):
+    print("Имя: ", note.get_name())
+    print("Фамилия: ", note.get_surname())
+    print("Номер телефона: ", note.get_phone_number())
+    print("Дата рождения: ", end="")
+    for x in note.get_birth_date():
+        print(x, end=" ")
+    print()
 
 
 @singledispatch
@@ -185,20 +184,28 @@ def find_note(list_of_notes: list, surname: str):
               "элемент не является объектом класса Note")
 
 
-def menu() -> int:
-    os.system("cls || clean")
-    while True:
+class Menu:
+    def __init__(self):
+        self._count_of_options = 1
+
+    def menu1(self):
+        self._count_of_options = 5
+        os.system("cls || clean")
         print("1. Создать заметку(максимум 8)")
         print("2. Вывести все заметки")
         print("3. Удалить заметку")
         print("4. Найти по фамилии")
         print("5. Выход")
+
+    def get_count_of_options(self):
+        return self._count_of_options
+
+    def input_option(self) -> int:
         buf = get_input_int()
-        if buf < 1 or buf > 5:
+        if buf < 1 or buf > self._count_of_options:
             print("Нет такой опции")
             input()
             os.system("cls || clear")
-            continue
         os.system("cls || clear")
         return buf
 
@@ -206,8 +213,10 @@ def menu() -> int:
 def main():
     list_of_notes = []
     count_of_notes = 0
+    menu = Menu()
     while True:
-        flag = menu()
+        menu.menu1()
+        flag = menu.input_option()
         if flag == 1:
             if count_of_notes >= 8:
                 print("Невозможно добавить новую запись!")
@@ -218,13 +227,12 @@ def main():
             list_of_notes.sort(key=methodcaller("get_phone_number"))
         if flag == 2:
             for note in list_of_notes:
-                note.print_note()
+                print_note(note)
             input()
         if flag == 3:
-            i: int = 0
             for i in range(count_of_notes):
                 print(i + 1, end=") ")
-                list_of_notes[i].print_note()
+                print_note(list_of_notes[i])
             print("Введите номер note:")
             buf = get_input_int()
             if buf > count_of_notes or buf < 1:
@@ -241,7 +249,7 @@ def main():
             for note in list_of_notes:
                 if note.get_surname() == surname:
                     exist = True
-                    note.print_note()
+                    print_note(note)
             if not exist:
                 print("Нет человека с такой фамилией!")
             input()
