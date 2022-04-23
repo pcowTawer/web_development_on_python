@@ -157,7 +157,7 @@ def input_note(format_of_input="", to_be_printed=""):
         with open(input("Введите название файла:")) as f:
             return input_note_from_file(f)
     note = Note()
-    note.surname = input("Введите имя: ")
+    note.name = input("Введите имя: ")
     note.surname = input("Введите фамилию: ")
     print("Введите номер телефона: ", end='')
     note.phone_number = get_input_int()
