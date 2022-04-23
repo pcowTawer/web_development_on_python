@@ -128,17 +128,15 @@ class Note:
 
 
 def print_note(note: Note):
-    print("Имя: ", note.get_name())
-    print("Фамилия: ", note.get_surname())
-    print("Номер телефона: ", note.get_phone_number())
-    print("Дата рождения: ", end="")
-    for x in note.get_birth_date():
-        print(x, end=" ")
-    print()
+    print("Имя: ", note.get_name(), end=", ")
+    print("фамилия: ", note.get_surname(), end=", ")
+    print("номер телефона: ", note.get_phone_number(), end=", ")
+    print("дата рождения: ", end="")
+    print(*note.get_birth_date(), end=";\n")
 
 
 @singledispatch
-def input_note(label) -> Note:
+def input_note(label = None) -> Note:
     os.system("cls || clean")
     note = Note()
     note.set_name(input("Введите имя: "))
@@ -226,8 +224,9 @@ def main():
             list_of_notes.append(input_note(None))
             list_of_notes.sort(key=methodcaller("get_phone_number"))
         if flag == 2:
-            for note in list_of_notes:
-                print_note(note)
+            for i in range(count_of_notes):
+                print(i + 1, end=") ")
+                print_note(list_of_notes[i])
             input()
         if flag == 3:
             for i in range(count_of_notes):
@@ -242,7 +241,6 @@ def main():
             count_of_notes -= 1
             list_of_notes.pop(buf - 1)
             list_of_notes.sort(key=methodcaller("get_phone_number"))
-
         if flag == 4:
             surname = input("Введите фамилию: ")
             exist: bool = False
