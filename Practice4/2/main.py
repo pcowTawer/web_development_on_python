@@ -133,9 +133,9 @@ class Note:
 
 
 def print_note(note: Note):
-    print("Имя: ", note.surname, end=", ")
+    print("Имя: ", note.name, end=", ")
     print("фамилия: ", note.surname, end=", ")
-    print("номер телефона: ", note.surname, end=", ")
+    print("номер телефона: ", note.phone_number, end=", ")
     print("дата рождения: ", end="")
     print(*note.birth_date, end=";\n")
 
@@ -151,8 +151,7 @@ def input_note_from_file(file):
 
 
 def input_note(format_of_input="", to_be_printed=""):
-    if to_be_printed != "":
-        print(to_be_printed)
+    print(to_be_printed, end="")
 
     if format_of_input == "file":
         with open(input("Введите название файла:")) as f:
