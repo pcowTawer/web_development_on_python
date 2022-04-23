@@ -1,7 +1,4 @@
-from functools import singledispatch
-import io
 import os
-from operator import methodcaller
 
 
 def get_input_int():
@@ -73,32 +70,40 @@ class Note:
         self._phone_number = None
         self._birth_date = []
 
-    def get_name(self):
+    @property
+    def name(self):
         return self._name
 
-    def get_surname(self):
+    @property
+    def surname(self):
         return self._surname
 
-    def get_phone_number(self):
+    @property
+    def phone_number(self):
         return self._phone_number
 
-    def get_birth_date(self):
+    @property
+    def birth_date(self):
         return self._birth_date
 
-    def set_name(self, name):
+    @name.setter
+    def name(self, name):
         self._name = str(name)
 
-    def set_surname(self, surname):
+    @surname.setter
+    def surname(self, surname):
         self._surname = surname
 
-    def set_phone_number(self, phone_number):
+    @phone_number.setter
+    def phone_number(self, phone_number):
         try:
             self._phone_number = int(phone_number)
         except ValueError:
             print("Переданный аргумент в set_phone_number() не является числом")
             input()
 
-    def set_birth_date(self, birth_date: list):
+    @birth_date.setter
+    def birth_date(self, birth_date: list):
         # Проверяем месяц
         try:
             month = int(birth_date[1])
@@ -128,40 +133,37 @@ class Note:
 
 
 def print_note(note: Note):
-    print("Имя: ", note.get_name(), end=", ")
-    print("фамилия: ", note.get_surname(), end=", ")
-    print("номер телефона: ", note.get_phone_number(), end=", ")
+    print("Имя: ", note.surname, end=", ")
+    print("фамилия: ", note.surname, end=", ")
+    print("номер телефона: ", note.surname, end=", ")
     print("дата рождения: ", end="")
-    print(*note.get_birth_date(), end=";\n")
+    print(*note.birth_date, end=";\n")
 
 
-@singledispatch
-def input_note(label = None) -> Note:
+def input_note_from_file(file):
     os.system("cls || clean")
     note = Note()
-    note.set_name(input("Введите имя: "))
-    note.set_surname(input("Введите фамилию: "))
-    print("Введите номер телефона: ", end='')
-    note.set_phone_number(get_input_int())
-    print("Введите дату рождения: ")
-    note.set_birth_date([get_input_int(), get_input_int(), get_input_int()])
+    note.name = str.rstrip(file.readline())
+    note.surname = str.rstrip(file.readline())
+    note.phone_number = file.readline()
+    note.birth_date = [file.readline(), file.readline(), file.readline()]
     return note
 
 
-@input_note.register(str)
-def _(label) -> Note:
-    print(label)
-    return input_note(None)
+def input_note(format_of_input="", to_be_printed=""):
+    if to_be_printed != "":
+        print(to_be_printed)
 
-
-@input_note.register(io.TextIOBase)
-def _(label) -> Note:
-    os.system("cls || clean")
+    if format_of_input == "file":
+        with open(input("Введите название файла:")) as f:
+            return input_note_from_file(f)
     note = Note()
-    note.set_name(str.rstrip(label.readline()))
-    note.set_surname(str.rstrip(label.readline()))
-    note.set_phone_number(label.readline())
-    note.set_birth_date([label.readline(), label.readline(), label.readline()])
+    note.surname = input("Введите имя: ")
+    note.surname = input("Введите фамилию: ")
+    print("Введите номер телефона: ", end='')
+    note.phone_number = get_input_int()
+    print("Введите дату рождения: ")
+    note.birth_date = [get_input_int(), get_input_int(), get_input_int()]
     return note
 
 
@@ -195,7 +197,8 @@ class Menu:
         print("4. Найти по фамилии")
         print("5. Выход")
 
-    def get_count_of_options(self):
+    @property
+    def count_of_options(self):
         return self._count_of_options
 
     def input_option(self) -> int:
@@ -221,8 +224,8 @@ def main():
                 input()
                 continue
             count_of_notes += 1
-            list_of_notes.append(input_note(None))
-            list_of_notes.sort(key=methodcaller("get_phone_number"))
+            list_of_notes.append(input_note())
+            list_of_notes.sort(key=lambda notes: notes.phone_number)
         if flag == 2:
             for i in range(count_of_notes):
                 print(i + 1, end=") ")
@@ -240,12 +243,12 @@ def main():
                 continue
             count_of_notes -= 1
             list_of_notes.pop(buf - 1)
-            list_of_notes.sort(key=methodcaller("get_phone_number"))
+            list_of_notes.sort(key=lambda notes: notes.phone_number)
         if flag == 4:
             surname = input("Введите фамилию: ")
             exist: bool = False
             for note in list_of_notes:
-                if note.get_surname() == surname:
+                if note.surname == surname:
                     exist = True
                     print_note(note)
             if not exist:
