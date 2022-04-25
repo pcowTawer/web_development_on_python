@@ -8,7 +8,7 @@ class List:
     def __init__(self):
         self.head = None
 
-    def add_in_top(self, other):
+    def add_in_head(self, other):
         if self.head is None:
             self.head = ListNode(other)
             return
@@ -25,6 +25,11 @@ class List:
             buf = buf.next
         buf.next = ListNode(other)
 
+    def remove(self):
+        if self.head is None:
+            return
+        self.head = self.head.next
+
     def __str__(self):
         word = ""
         buf = self.head
@@ -37,17 +42,32 @@ class List:
 
 class Deque:
     def __init__(self):
-        self.list_of_pre = List()
+        self.list_of_pre = []
         self.local_list = List()
 
-    def add_in_top(self, other):
-        self.local_list.add_in_top(other)
-        self.list_of_pre.add_in_top(None)
+    def add_in_head(self, other):
+        self.local_list.add_in_head(other)
+        self.list_of_pre.insert(0, None)
         if self.local_list.head.next is not None:
-            self.list_of_pre.head.next = self.local_list.head
+            self.list_of_pre[1] = self.local_list.head
 
     def add_in_end(self, other):
         self.local_list.add_in_end(other)
+        self.list_of_pre.append(self.list_of_pre[self.list_of_pre.__len__() - 1].next)
+
+    def remove_in_head(self):
+        self.local_list.remove()
+        self.list_of_pre.pop(1)
+
+    def remove_in_end(self):
+        self.list_of_pre[self.list_of_pre.__len__() - 1].next = None
+        self.list_of_pre.pop(self.list_of_pre.__len__() - 1)
+
+    def print_list_of_pre(self):
+        word = "None "
+        for buf in self.list_of_pre[1:]:
+            word = word + str(buf.object) + " "
+        print(word)
 
     def __str__(self):
         word = ""
@@ -60,20 +80,19 @@ class Deque:
 
 
 def main():
-    # my_list = List()
-    # my_list.add_in_top(5)
-    # my_list.add_in_top(4)
-    # my_list.add_in_top(3)
-    # my_list.add_in_top(2)
-    # my_list.add_in_top(1)
-    # my_list.add_in_top(6)
-    # print(my_list)
     deque = Deque()
-    deque.add_in_top(5)
-    deque.add_in_top(4)
-    deque.add_in_top(3)
-    deque.add_in_top(2)
+    deque.add_in_head(5)
+    deque.add_in_head(4)
+    deque.add_in_head(3)
+    deque.add_in_head(2)
     deque.add_in_end(10)
+    deque.add_in_head(15)
+    deque.add_in_end(15)
+    deque.add_in_end(15)
+    deque.remove_in_end()
+    deque.add_in_head(15)
+    deque.remove_in_head()
+    deque.print_list_of_pre()
     print(deque)
 
 
