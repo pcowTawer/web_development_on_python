@@ -60,7 +60,9 @@ class MainWindow(QMainWindow):
                        (self.Triangle_point2y - self.Triangle_point3y)**2)**0.5
             length3 = ((self.Triangle_point3x - self.Triangle_point1x)**2 +
                        (self.Triangle_point3y - self.Triangle_point1y)**2)**0.5
-            if not self.triangle.intersects(self.rectangle) \
+            if self.triangle.intersection(self.rectangle) and self.triangle.touches(self.rectangle):
+                break
+            if not self.triangle.intersection(self.rectangle) \
                     and length3 < length2 + length1 \
                     and length2 < length3 + length1 \
                     and length1 < length3 + length2:
