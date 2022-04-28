@@ -1,6 +1,6 @@
-To run program write this commands in CMD(second not necessary)
+To run program write this commands in CMD
 
 pip install pyqt6
 
-pip install pyqt-tools
+pip install shapely
 
