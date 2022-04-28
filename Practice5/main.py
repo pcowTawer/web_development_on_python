@@ -3,7 +3,7 @@ import sys
 from PyQt6.QtWidgets import (QMainWindow, QApplication, QLabel, QLineEdit, QVBoxLayout, QWidget, QPushButton)
 from PyQt6.QtCore import Qt, QPoint, QRect, QSize
 from PyQt6.QtGui import QPainter, QPolygon
-from shapely.geometry import Polygon
+from shapely.geometry import Polygon, LineString
 
 
 def random_int_except(a, b, c, d):
@@ -53,19 +53,11 @@ class MainWindow(QMainWindow):
                                             (self.Triangle_point3x, self.Triangle_point3y)]
 
             self.triangle = Polygon(self.coordinates_of_triangle)
-
-            length1 = ((self.Triangle_point1x - self.Triangle_point2x)**2 +
-                       (self.Triangle_point1y - self.Triangle_point2y)**2)**0.5
-            length2 = ((self.Triangle_point2x - self.Triangle_point3x)**2 +
-                       (self.Triangle_point2y - self.Triangle_point3y)**2)**0.5
-            length3 = ((self.Triangle_point3x - self.Triangle_point1x)**2 +
-                       (self.Triangle_point3y - self.Triangle_point1y)**2)**0.5
+            if not self.triangle.is_valid:
+                continue
             if self.triangle.intersection(self.rectangle) and self.triangle.touches(self.rectangle):
                 break
-            if not self.triangle.intersection(self.rectangle) \
-                    and length3 < length2 + length1 \
-                    and length2 < length3 + length1 \
-                    and length1 < length3 + length2:
+            if not self.triangle.intersection(self.rectangle):
                 break
 
         self.label_txt1 = QLabel("Найдите площадь фигур(ы)")
