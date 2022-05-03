@@ -3,7 +3,7 @@ import sys
 from PyQt6.QtWidgets import (QMainWindow, QApplication, QLabel, QLineEdit, QVBoxLayout, QWidget, QPushButton)
 from PyQt6.QtCore import Qt, QPoint, QRect, QSize
 from PyQt6.QtGui import QPainter, QPolygon
-from shapely.geometry import Polygon, LineString
+from shapely.geometry import Polygon
 
 
 def random_int_except(a, b, c, d):
@@ -102,6 +102,8 @@ class MainWindow(QMainWindow):
     def paintEvent(self, event):
         self.img_scale = int((self.height() - self.label_txt1.height() - self.line_edit_widget.height() -
                               self.label_result.height() - self.button_next.height() - 50) / 20)
+        self.img_scale += int((self.width() - 50) < self.img_scale * 20) * (
+                    int((self.width() - 50) / 20) - self.img_scale)
         x_offset = int(0.5 * self.width() - 10 * self.img_scale)
         y_offset = 70
         painter = QPainter()
