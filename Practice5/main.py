@@ -19,40 +19,40 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
         self.setGeometry(0, 0, 700, 700)
         self.setWindowTitle("Test")
+        self.init_rect()
+        self.init_triangle()
         self.init_ui()
 
-    def init_ui(self):
-        self.Rect_point1x = random.randint(0, 20)
-        self.Rect_point1y = random.randint(0, 20)
-        self.Rect_point2x = random_int_except(0, 20, self.Rect_point1x, self.Rect_point1x)
-        self.Rect_point2y = random_int_except(0, 20, self.Rect_point1y, self.Rect_point1y)
+    def init_rect(self):
+        rect_point1x = random.randint(0, 20)
+        rect_point1y = random.randint(0, 20)
+        rect_point2x = random_int_except(0, 20, rect_point1x, rect_point1x)
+        rect_point2y = random_int_except(0, 20, rect_point1y, rect_point1y)
 
-        if self.Rect_point1x > self.Rect_point2x:
-            self.Rect_point1x, self.Rect_point2x = self.Rect_point2x, self.Rect_point1x
-        if self.Rect_point1y > self.Rect_point2y:
-            self.Rect_point1y, self.Rect_point2y = self.Rect_point2y, self.Rect_point1y
+        if rect_point1x > rect_point2x:
+            rect_point1x, rect_point2x = rect_point2x, rect_point1x
+        if rect_point1y > rect_point2y:
+            rect_point1y, rect_point2y = rect_point2y, rect_point1y
 
-        self.coordinates_of_rectangle = [(self.Rect_point1x, self.Rect_point1y),
-                                         (self.Rect_point1x, self.Rect_point2y),
-                                         (self.Rect_point2x, self.Rect_point2y),
-                                         (self.Rect_point2x, self.Rect_point1y)]
+        coordinates_of_rectangle = [(rect_point1x, rect_point1y),
+                                    (rect_point1x, rect_point2y),
+                                    (rect_point2x, rect_point2y),
+                                    (rect_point2x, rect_point1y)]
+        self.rectangle = Polygon(coordinates_of_rectangle)
 
-        self.rectangle = Polygon(self.coordinates_of_rectangle)
-
+    def init_triangle(self):
         while True:
+            triangle_point1x = random.randint(0, 20)
+            triangle_point1y = random.randint(0, 20)
+            triangle_point2x = random.randint(0, 20)
+            triangle_point2y = random.randint(0, 20)
+            triangle_point3x = random.randint(0, 20)
+            triangle_point3y = random.randint(0, 20)
 
-            self.Triangle_point1x = random.randint(0, 20)
-            self.Triangle_point1y = random.randint(0, 20)
-            self.Triangle_point2x = random.randint(0, 20)
-            self.Triangle_point2y = random.randint(0, 20)
-            self.Triangle_point3x = random.randint(0, 20)
-            self.Triangle_point3y = random.randint(0, 20)
-
-            self.coordinates_of_triangle = [(self.Triangle_point1x, self.Triangle_point1y),
-                                            (self.Triangle_point2x, self.Triangle_point2y),
-                                            (self.Triangle_point3x, self.Triangle_point3y)]
-
-            self.triangle = Polygon(self.coordinates_of_triangle)
+            coordinates_of_triangle = [(triangle_point1x, triangle_point1y),
+                                            (triangle_point2x, triangle_point2y),
+                                            (triangle_point3x, triangle_point3y)]
+            self.triangle = Polygon(coordinates_of_triangle)
             if not self.triangle.is_valid:
                 continue
             if self.triangle.intersection(self.rectangle) and self.triangle.touches(self.rectangle):
@@ -60,6 +60,7 @@ class MainWindow(QMainWindow):
             if not self.triangle.intersection(self.rectangle):
                 break
 
+    def init_ui(self):
         self.label_txt1 = QLabel("Найдите площадь фигур(ы)")
         font = self.label_txt1.font()
         font.setPointSize(30)
@@ -120,21 +121,28 @@ class MainWindow(QMainWindow):
                              y_offset + 20 * self.img_scale,
                              x_offset + i * self.img_scale,
                              y_offset)
+        rc = list(self.rectangle.exterior.coords)
+        painter.drawRect(
+                         int(x_offset + rc[0][0] * self.img_scale),
 
-        painter.drawRect(x_offset + self.Rect_point1x * self.img_scale,
-                         y_offset + self.Rect_point1y * self.img_scale,
-                         x_offset + self.Rect_point2x * self.img_scale -
-                         (x_offset + self.Rect_point1x * self.img_scale),
-                         y_offset + self.Rect_point2y * self.img_scale -
-                         (y_offset + self.Rect_point1y * self.img_scale))
+                         int(y_offset + rc[0][1] * self.img_scale),
+
+                         int(x_offset + rc[2][0] * self.img_scale -
+                                (x_offset + rc[0][0] * self.img_scale)),
+
+                         int(y_offset + rc[1][1] * self.img_scale -
+                                (y_offset + rc[0][1] * self.img_scale))
+        )
+
+        trc = list(self.triangle.exterior.coords)
 
         points = [
-            QPoint(x_offset + self.Triangle_point1x * self.img_scale,
-                   y_offset + self.Triangle_point1y * self.img_scale),
-            QPoint(x_offset + self.Triangle_point2x * self.img_scale,
-                   y_offset + self.Triangle_point2y * self.img_scale),
-            QPoint(x_offset + self.Triangle_point3x * self.img_scale,
-                   y_offset + self.Triangle_point3y * self.img_scale)
+            QPoint(int(x_offset + trc[0][0] * self.img_scale),
+                   int(y_offset + trc[0][1] * self.img_scale)),
+            QPoint(int(x_offset + trc[1][0] * self.img_scale),
+                   int(y_offset + trc[1][1] * self.img_scale)),
+            QPoint(int(x_offset + trc[2][0] * self.img_scale),
+                   int(y_offset + trc[2][1] * self.img_scale))
         ]
         poly = QPolygon(points)
         painter.drawPolygon(poly)
@@ -157,16 +165,14 @@ class MainWindow(QMainWindow):
         self.layout.addWidget(self.button_next)
 
     def calculate_square(self):
-        result = abs(self.Rect_point1x - self.Rect_point2x) * abs(self.Rect_point2y - self.Rect_point1y) + \
-               0.5*abs((self.Triangle_point2x - self.Triangle_point1x) *
-                       (self.Triangle_point3y - self.Triangle_point1y) -
-                       (self.Triangle_point3x - self.Triangle_point1x) *
-                       (self.Triangle_point2y - self.Triangle_point1y))
+        result = self.rectangle.area + self.triangle.area
         return result
 
     def load_new_try(self):
         for i in reversed(range(self.layout.count())):
             self.layout.itemAt(i).widget().setParent(QWidget())
+        self.init_rect()
+        self.init_triangle()
         self.init_ui()
 
 

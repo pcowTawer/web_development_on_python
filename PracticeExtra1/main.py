@@ -4,39 +4,27 @@ from PyQt6.QtWidgets import (QMainWindow, QApplication, QLabel, QVBoxLayout, QWi
 from PyQt6.QtCore import Qt, QPoint, QRect, QSize
 from PyQt6.QtGui import QPainter
 
-def is_touches(field, x, y):
-    if x >= 10 or y >= 10:
-        return None
-    if x < 0 or y < 0:
-        return None
-    if field[x][y] == 1:
-        return True
 
-    if x + 1 < 10:
-        if field[x + 1][y] == 1:
-            return True
-    if x + 1 < 10 and y + 1 < 10:
-        if field[x + 1][y + 1] == 1:
-            return True
-    if y + 1 < 10:
-        if field[x][y + 1] == 1:
-            return True
-    if x - 1 >= 0 and y + 1 < 10:
-        if field[x - 1][y + 1] == 1:
-            return True
-    if x - 1 >= 0:
-        if field[x - 1][y] == 1:
-            return True
-    if x - 1 >= 0 and y - 1 >= 0:
-        if field[x - 1][y - 1] == 1:
-            return True
-    if y - 1 >= 0:
-        if field[x][y - 1] == 1:
-            return True
-    if x + 1 < 10 and y >= 0:
-        if field[x + 1][y - 1] == 1:
-            return True
-    return False
+def is_touches(field, x, y):
+    if x >= 10 or y >= 10 or x < 0 or y < 0:
+        return None
+    result = 0
+    x1 = x - 1
+    x2 = x + 1
+    y1 = y - 1
+    y2 = y + 1
+    if y + 1 >= 10:
+        y2 = y
+    if y - 1 < 0:
+        y1 = y
+    if x + 1 >= 10:
+        x2 = x
+    if x - 1 < 0:
+        x1 = x
+    for i in range(x1, x2 + 1):
+        for j in range(y1, y2 + 1):
+            result += field[i][j]
+    return bool(result)
 
 
 def is_filled(field):
@@ -54,30 +42,41 @@ def generate_ship(field, ship_length):
     x1: int
     y1: int
     ship_length -= 1
-    x = 1
-    y = 5
+
     while True:
+        variants = []
+        x = random.randint(0, 9)
+        y = random.randint(0, 9)
         while (is_touches(field, x, y) is None) or is_touches(field, x, y):
             x = random.randint(0, 9)
             y = random.randint(0, 9)
         if (not is_touches(field, x + ship_length, y)) and (not (is_touches(field, x + ship_length, y) is None)):
-            x1 = x + ship_length
-            y1 = y
-            break
+            variants.append(0)
         if (not is_touches(field, x, y + ship_length)) and (not (is_touches(field, x, y + ship_length) is None)):
-            x1 = x
-            y1 = y + ship_length
-            break
+            variants.append(1)
         if (not is_touches(field, x - ship_length, y)) and (not (is_touches(field, x - ship_length, y) is None)):
-            x1 = x - ship_length
-            y1 = y
-            break
+            variants.append(2)
         if (not is_touches(field, x, y - ship_length)) and (not (is_touches(field, x, y - ship_length) is None)):
-            x1 = x
-            y1 = y - ship_length
-            break
-        x = random.randint(0, 9)
-        y = random.randint(0, 9)
+            variants.append(3)
+        if variants.__len__() > 0:
+            flag = random.choice(variants)
+            if flag == 0:
+                x1 = x + ship_length
+                y1 = y
+                break
+            if flag == 1:
+                x1 = x
+                y1 = y + ship_length
+                break
+            if flag == 2:
+                x1 = x - ship_length
+                y1 = y
+                break
+            if flag == 3:
+                x1 = x
+                y1 = y - ship_length
+                break
+
     if x1 < x:
         x, x1 = x1, x
     if y1 < y:
@@ -85,8 +84,6 @@ def generate_ship(field, ship_length):
     for i in range(x, x1 + 1):
         for j in range(y, y1 + 1):
             field[i][j] = 1
-
-    # print(str(x), str(x1), str(y), str(y1), sep=" ")
 
 
 def generate_field():
@@ -170,7 +167,8 @@ class MainWindow(QMainWindow):
 
     def paintEvent(self, event):
         self.img_scale = int((self.height() - self.label_txt1.height() - 50) / 10)
-        self.img_scale += int((self.width() - 50) < self.img_scale * 10) * (int((self.width() - 50) / 10) - self.img_scale)
+        self.img_scale += int((self.width() - 50) < self.img_scale * 10) * (
+                    int((self.width() - 50) / 10) - self.img_scale)
 
         x_offset = int(0.5 * self.width() - 5 * self.img_scale)
         y_offset = 70
@@ -196,11 +194,10 @@ class MainWindow(QMainWindow):
                                      self.img_scale, self.img_scale)
 
 
-
 def main():
-    app = QApplication(sys.argv)
-    window = MainWindow()
-    app.exec()
+    field1 = generate_field()
+    field2 = generate_field()
+    print_fields(field1, field2)
 
 
 if __name__ == "__main__":
